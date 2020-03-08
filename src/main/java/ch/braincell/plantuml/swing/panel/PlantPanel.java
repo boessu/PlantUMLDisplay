@@ -103,8 +103,8 @@ public class PlantPanel extends JPanel {
 	}
 
 	/**
-	 * 
-	 * @return
+	 * Returns the Toolbar. In such the case you need to add something like a button or so.
+	 * @return the toolbar of the panel.
 	 */
 	public JToolBar getToolBar() {
 		return toolBar;
