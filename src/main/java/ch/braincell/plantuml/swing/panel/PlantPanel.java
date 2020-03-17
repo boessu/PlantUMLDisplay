@@ -35,6 +35,7 @@ import net.sourceforge.plantuml.SourceStringReader;
 import net.sourceforge.plantuml.core.DiagramDescription;
 
 public class PlantPanel extends JPanel {
+
 	Logger log = Logger.getLogger(PlantPanel.class.getCanonicalName());
 
 	private static final long serialVersionUID = 1L;
@@ -93,7 +94,8 @@ public class PlantPanel extends JPanel {
 
 	/**
 	 * Displays the PlantUML source.
-	 * @param plantUml	String with PlantUML syntax.
+	 * 
+	 * @param plantUml String with PlantUML syntax.
 	 */
 	public void renderPlant(String plantUml) {
 		copyButton.setEnabled(true);
@@ -103,11 +105,43 @@ public class PlantPanel extends JPanel {
 	}
 
 	/**
-	 * Returns the Toolbar. In such the case you need to add something like a button or so.
+	 * Returns the Toolbar. In such the case you need to add something like a button
+	 * or so.
+	 * 
 	 * @return the toolbar of the panel.
 	 */
 	public JToolBar getToolBar() {
 		return toolBar;
+	}
+
+	/**
+	 * Returns the raw SVG XML which is actually displayed. Yes, you also get "The
+	 * plant error display" that way. This is actually the best bet if you try to
+	 * find and interpret syntax errors (really).
+	 * 
+	 * @return the SVG as String, null if there is actually no code to render.
+	 */
+	public String getSVGPlant() {
+		String result = null;
+
+		if (plantUMLScript != null) {
+			SourceStringReader reader = new SourceStringReader(plantUMLScript);
+
+			final ByteArrayOutputStream os = new ByteArrayOutputStream();
+			// Write the first image to "os"
+			try {
+				DiagramDescription desc = reader.outputImage(os, new FileFormatOption(FileFormat.SVG));
+				os.close();
+				log.info("Parsed plant: " + desc.getDescription());
+				result = new String(os.toByteArray(), Charset.forName("UTF-8"));
+			} catch (IOException e) {
+				log.severe("IO Exceptions on Strings: source " + plantUMLScript);
+			} finally {
+				closeStream(os);
+			}
+		}
+
+		return result;
 	}
 
 	protected void copyPlantToClipboard() {
@@ -181,7 +215,7 @@ public class PlantPanel extends JPanel {
 						// The XML is stored into svg
 						plantUMLSVG = new String(os.toByteArray(), Charset.forName("UTF-8"));
 						writer = new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8);
-					    writer.write(plantUMLSVG);
+						writer.write(plantUMLSVG);
 					} else {
 						// png will be saved.
 						is = new ByteArrayInputStream(os.toByteArray());
