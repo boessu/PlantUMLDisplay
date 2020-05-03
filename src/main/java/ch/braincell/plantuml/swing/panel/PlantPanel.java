@@ -16,6 +16,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import ch.braincell.plantuml.swing.svg.SVGPanel;
 import ch.braincell.plantuml.tools.PlantUtil;
 import net.sourceforge.plantuml.FileFormat;
+import net.sourceforge.plantuml.sequencediagram.Newpage;
 
 public class PlantPanel extends JPanel {
 
@@ -101,6 +102,8 @@ public class PlantPanel extends JPanel {
 	 * plant error display" that way. This is actually the best bet if you try to
 	 * find and interpret syntax errors (really).
 	 * 
+	 * @deprecated You should use the new {@link PlantUtil#getSVGPlant(String)}
+	 *             instead. Have a look.
 	 * @return the SVG as String, null if there is actually no code to render.
 	 */
 	public String getSVGPlant() {
