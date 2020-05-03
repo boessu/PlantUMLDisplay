@@ -1,4 +1,4 @@
-package ch.braincell.plantuml.swing.panel;
+package ch.braincell.plantuml.tools;
 
 import java.awt.Image;
 import java.awt.datatransfer.DataFlavor;

@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>ch.braincell</groupId>
 	<artifactId>plantuml.swing.panel</artifactId>
-	<version>1.0.1</version>
+	<version>1.0.2</version>
 	<name>Plantuml SWING Panel</name>
 	<description>This is just a small tool to get a local PlantUML GUI. This is useful if you generate PlantUML diagrams e.g. as a report, just to get a quick-visualization.</description>
 	<properties>

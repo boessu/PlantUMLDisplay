@@ -1,26 +1,11 @@
 package ch.braincell.plantuml.swing.panel;
 
 import java.awt.BorderLayout;
-import java.awt.Image;
-import java.awt.Toolkit;
-import java.awt.datatransfer.Clipboard;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.util.logging.Logger;
 
-import javax.imageio.ImageIO;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JPanel;
@@ -29,10 +14,8 @@ import javax.swing.JToolBar;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import ch.braincell.plantuml.swing.svg.SVGPanel;
+import ch.braincell.plantuml.tools.PlantUtil;
 import net.sourceforge.plantuml.FileFormat;
-import net.sourceforge.plantuml.FileFormatOption;
-import net.sourceforge.plantuml.SourceStringReader;
-import net.sourceforge.plantuml.core.DiagramDescription;
 
 public class PlantPanel extends JPanel {
 
@@ -48,7 +31,6 @@ public class PlantPanel extends JPanel {
 	private static final int VERTICAL_SCROLL_UNITS = 16;
 
 	protected String plantUMLScript = null;
-	protected String plantUMLSVG = null;
 
 	private PlantRenderThread thread = null;
 
@@ -122,52 +104,11 @@ public class PlantPanel extends JPanel {
 	 * @return the SVG as String, null if there is actually no code to render.
 	 */
 	public String getSVGPlant() {
-		String result = null;
-
-		if (plantUMLScript != null) {
-			SourceStringReader reader = new SourceStringReader(plantUMLScript);
-
-			final ByteArrayOutputStream os = new ByteArrayOutputStream();
-			// Write the first image to "os"
-			try {
-				DiagramDescription desc = reader.outputImage(os, new FileFormatOption(FileFormat.SVG));
-				os.close();
-				log.info("Parsed plant: " + desc.getDescription());
-				result = new String(os.toByteArray(), Charset.forName("UTF-8"));
-			} catch (IOException e) {
-				log.severe("IO Exceptions on Strings: source " + plantUMLScript);
-			} finally {
-				closeStream(os);
-			}
-		}
-
-		return result;
+		return PlantUtil.getSVGPlant(plantUMLScript);
 	}
 
 	protected void copyPlantToClipboard() {
-		Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-
-		if (plantUMLScript != null) {
-			ByteArrayOutputStream os = null;
-			ByteArrayInputStream is = null;
-			Image image = null;
-			try {
-				SourceStringReader reader = new SourceStringReader(plantUMLScript);
-
-				os = new ByteArrayOutputStream();
-				reader.outputImage(os, new FileFormatOption(FileFormat.PNG));
-				is = new ByteArrayInputStream(os.toByteArray());
-				image = ImageIO.read(is);
-			} catch (IOException ex) {
-				throw new RuntimeException(ex);
-			} finally {
-				closeStream(is);
-				closeStream(os);
-			}
-			if (null != image) {
-				clipboard.setContents(new ImageSelection(image), null);
-			}
-		}
+		PlantUtil.copyPlantToClipboard(plantUMLScript);
 	}
 
 	protected void savePlantPicture() {
@@ -198,69 +139,9 @@ public class PlantPanel extends JPanel {
 				else
 					file = new File(chooser.getSelectedFile().getAbsolutePath() + postfix);
 
-				log.info("File will be written... " + file.getAbsolutePath());
-
-				SourceStringReader reader = new SourceStringReader(plantUMLScript);
-
-				final ByteArrayOutputStream os = new ByteArrayOutputStream();
-				ByteArrayInputStream is = null;
-				OutputStreamWriter writer = null;
-				// Write the first image to "os"
-				try {
-					DiagramDescription desc = reader.outputImage(os, new FileFormatOption(ff));
-					os.close();
-					log.info("Parsed plant: " + desc.getDescription());
-
-					if (ff == FileFormat.SVG) {
-						// The XML is stored into svg
-						plantUMLSVG = new String(os.toByteArray(), Charset.forName("UTF-8"));
-						writer = new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8);
-						writer.write(plantUMLSVG);
-					} else {
-						// png will be saved.
-						is = new ByteArrayInputStream(os.toByteArray());
-						BufferedImage image = ImageIO.read(is);
-						ImageIO.write(image, "png", file);
-					}
-				} catch (IOException e) {
-					throw new RuntimeException(e);
-				} finally {
-					closeStream(is);
-					closeStream(os);
-					closeWriter(writer);
-				}
-
+				PlantUtil.savePicture(plantUMLScript, file, ff);
 			}
 		}
 	}
 
-	private void closeStream(InputStream stream) {
-		if (stream != null) {
-			try {
-				stream.close();
-			} catch (IOException ex) {
-				throw new RuntimeException(ex);
-			}
-		}
-	}
-
-	private void closeStream(OutputStream stream) {
-		if (stream != null) {
-			try {
-				stream.close();
-			} catch (IOException ex) {
-				throw new RuntimeException(ex);
-			}
-		}
-	}
-
-	private void closeWriter(Writer writer) {
-		if (writer != null) {
-			try {
-				writer.close();
-			} catch (IOException ex) {
-				throw new RuntimeException(ex);
-			}
-		}
-	}
 }
