@@ -35,6 +35,10 @@
 							<addClasspath>true</addClasspath>
 							<mainClass>ch.braincell.plantuml.swing.Main</mainClass>
 						</manifest>
+						<manifestEntries>
+							<Automatic-Module-Name>ch.braincell.plantuml.swing</Automatic-Module-Name>
+						</manifestEntries>
+
 					</archive>
 				</configuration>
 			</plugin>
